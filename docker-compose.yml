@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  estoque-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 121415
+      POSTGRES_DB: estoquedb
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d estoquedb" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  estoque-api:
+    build:
+      context: .
+      dockerfile: src/Estoque/Estoque.Api/Dockerfile
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=estoque-db;Port=5432;Database=estoquedb;Username=postgres;Password=121415;Trust Server Certificate=true;
+    depends_on:
+      estoque-db:
+        condition: service_healthy
