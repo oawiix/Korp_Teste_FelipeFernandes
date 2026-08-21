@@ -18,11 +18,26 @@ public class NotaFiscalService : INotaFiscalService
         CancellationToken cancellationToken = default)
     {
         var notaFiscalDb = await _repository.ObterNotaFiscalPorIdAsync(id, cancellationToken);
-        if (notaFiscalDb == null) return Result<NotaFiscalDto>.Failure("A Nota fiscal não existe.");
-        return Result<NotaFiscalDto>.Success(new NotaFiscalDto());
-    }
+        if (notaFiscalDb == null) return Result<NotaFiscalDto>.Failure("A Nota nao existe.");
+        var response = new NotaFiscalDto
+        {
+            Id = notaFiscalDb.Id,
+            Ativo = notaFiscalDb.Ativo,
+            ItemNotasFiscal = notaFiscalDb.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
+            {
+                Id = item.ItemId,
+                Codigo = item.Codigo,
+                Descricao = item.Descricao,
+                Saldo = item.Saldo
+            }).ToList()
 
-    public async Task<Result<IEnumerable<ObterNotasFiscaisListDto>>> ObterNotasFiscaisListAsync(
+        };
+            return Result<NotaFiscalDto>.Success(response); 
+    }
+    
+
+
+public async Task<Result<IEnumerable<ObterNotasFiscaisListDto>>> ObterNotasFiscaisListAsync(
         CancellationToken cancellationToken = default)
     {
         var notasFiscaisDb = await _repository.ObterNotasFiscaisListAsync(cancellationToken);
@@ -33,7 +48,7 @@ public class NotaFiscalService : INotaFiscalService
             Ativo = nf.Ativo,
             ItemNotasFiscal = nf.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
             {
-                Id = item.Id,
+                Id = item.ItemId,
                 Codigo = item.Codigo,
                 Descricao = item.Descricao,
                 Saldo = item.Saldo
@@ -79,7 +94,7 @@ public class NotaFiscalService : INotaFiscalService
             Ativo = notaFiscalExistente.Ativo,
             ItemNotasFiscal = notaFiscalExistente.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
             {
-                Id = item.Id,
+                Id = item.ItemId,
                 Codigo = item.Codigo,
                 Descricao = item.Descricao,
                 Saldo = item.Saldo

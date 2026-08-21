@@ -2,7 +2,7 @@ namespace Faturamento.Domain.Entities;
 
 public class ItemNotaFiscal
 {
-    public Guid Id { get; private set; }
+    public Guid ItemId { get; private set; }
     public string Codigo { get; private set; } = String.Empty;
     public string Descricao { get; private set; } = String.Empty;
     public int Saldo { get; private set; } = Int32.MinValue;
@@ -11,9 +11,9 @@ public class ItemNotaFiscal
     {
     }
 
-    public ItemNotaFiscal (Guid id, string codigo, string descricao, int saldoInicial)
+    public ItemNotaFiscal (Guid itemId, string codigo, string descricao, int saldoInicial)
     {
-        Id = id;
+        ItemId = itemId;
         Codigo = codigo;
         Descricao = descricao;
         if(saldoInicial < 0) throw new ArgumentOutOfRangeException(nameof(saldoInicial));

@@ -17,6 +17,7 @@ public class NotaFiscalRepository : INotaFiscalRepository
     public async Task<NotaFiscal?> ObterNotaFiscalPorIdAsync(int id, CancellationToken cancellationToken = default)
     {
         var notaFiscalDb = await _context.NotaFiscal.
+            Include(n => n.ItemNotaFiscal).
             AsNoTracking().
             FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         return notaFiscalDb;

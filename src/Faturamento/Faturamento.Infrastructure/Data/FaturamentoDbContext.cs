@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Faturamento.Domain.Entities;
-using Faturamento.Domain.Entities;
 
 namespace Faturamento.Infrastructure.Data;
 
@@ -26,14 +25,22 @@ public class FaturamentoDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<NotaFiscal>().HasKey(p => p.Id);
-        modelBuilder.Entity<NotaFiscal>().Property(p => p.Ativo).IsRequired();
-        modelBuilder.Entity<NotaFiscal>().Property(p => p.ItemNotaFiscal).IsRequired();
-        
-        modelBuilder.Entity<ItemNotaFiscal>().HasKey(p => p.Id);
-        modelBuilder.Entity<ItemNotaFiscal>().Property(p => p.Codigo).IsRequired();
-        modelBuilder.Entity<ItemNotaFiscal>().Property(p => p.Descricao).IsRequired();
-        modelBuilder.Entity<ItemNotaFiscal>().Property(p => p.Saldo).IsRequired();
-        
+        modelBuilder.Entity<NotaFiscal>(builder =>
+        {
+            builder.HasKey(n => n.Id);
+            builder.Property(p => p.Ativo).IsRequired();
+            builder.HasMany(n => n.ItemNotaFiscal)
+                .WithOne()
+                .HasForeignKey("NotaFiscalId")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+        modelBuilder.Entity<ItemNotaFiscal>(builder =>
+        {
+            builder.HasKey(n => n.ItemId);
+            builder.Property(p => p.Codigo).IsRequired();
+            builder.Property(p => p.Descricao).IsRequired();
+            builder.Property(p =>p.Saldo).IsRequired();
+        });
+
     }
 }

@@ -16,7 +16,7 @@ public class NotasFiscaisController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> ObterNotaFiscalPorIdAsync([FromRoute]int id,
+    public async Task<IActionResult> ObterNotaFiscalPorIdAsync(int id,
         CancellationToken cancellationToken = default)
     {
         {
@@ -37,7 +37,7 @@ public class NotasFiscaisController : ControllerBase
 
                 var responseSuccess = new ResponseModel<NotaFiscalDto>(
                     data: result.Value!,
-                    Message: "Produto criado com sucesso.",
+                    Message: "A Nota fiscal nao existe.",
                     Success: true,
                     TimeStamp: DateTime.Now
                 );
