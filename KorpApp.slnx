@@ -6,4 +6,10 @@
     <Project Path="src/Estoque/Estoque.Domain/Estoque.Domain.csproj" />
     <Project Path="src/Estoque/Estoque.Infrastructure/Estoque.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Faturamento/">
+    <Project Path="src/Faturamento/Faturamento.Api/Faturamento.Api.csproj" />
+    <Project Path="src/Faturamento/Faturamento.Application/Faturamento.Application.csproj" />
+    <Project Path="src/Faturamento/Faturamento.Domain/Faturamento.Domain.csproj" />
+    <Project Path="src/Faturamento/Faturamento.Infrastructure/Faturamento.Infrastructure.csproj" />
+  </Folder>
 </Solution>
