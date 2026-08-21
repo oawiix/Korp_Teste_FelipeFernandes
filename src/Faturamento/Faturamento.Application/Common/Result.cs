@@ -1,4 +1,4 @@
-namespace Estoque.Application.Common;
+namespace Faturamento.Application.Common;
 
 public class Result<T>
 {

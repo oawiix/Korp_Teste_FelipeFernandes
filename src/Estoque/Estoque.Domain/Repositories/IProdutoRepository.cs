@@ -8,6 +8,4 @@ public interface IProdutoRepository
     Task<Produto?> AdicionarAsync(Produto produto, CancellationToken cancellationToken = default);
     Task<Produto?> AtualizarAsync(Produto produto,  CancellationToken cancellationToken = default);
     Task<Produto?> RemoverAsync(Guid prudutoId, CancellationToken cancellationToken = default);
-    
-    
 }

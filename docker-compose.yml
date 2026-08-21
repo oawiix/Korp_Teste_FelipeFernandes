@@ -14,6 +14,19 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  faturamento-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 121415
+      POSTGRES_DB: faturamentodb
+    ports:
+      - "5435:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d estoquedb" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   estoque-api:
     build:
@@ -24,6 +37,19 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=estoque-db;Port=5432;Database=estoquedb;Username=postgres;Password=121415;Trust Server Certificate=true;
+    depends_on:
+      estoque-db:
+        condition: service_healthy
+    
+  faturamento-api:
+    build:
+      context: .
+      dockerfile: src/Estoque/Estoque.Api/Dockerfile
+    ports:
+      - "5002:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=faturamento-db;Port=5432;Database=faturamentodb;Username=postgres;Password=121415;Trust Server Certificate=true;
     depends_on:
       estoque-db:
         condition: service_healthy

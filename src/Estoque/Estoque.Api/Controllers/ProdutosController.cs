@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Estoque.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("Estoque/[controller]")]
 public class ProdutosController : ControllerBase
 {
     private readonly IProdutoService _produtoService;

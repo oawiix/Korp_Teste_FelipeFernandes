@@ -16,9 +16,9 @@ public class ProdutoRepository : IProdutoRepository
 
     public async Task<Produto?> ObterProdutoPorIdAsync(Guid produtoId, CancellationToken cancellationToken = default)
     {
-        var produto = await _context.Produtos.AsNoTracking().
+        var produtoDb = await _context.Produtos.AsNoTracking().
             FirstOrDefaultAsync(p => p.Id == produtoId, cancellationToken);
-        return produto;
+        return produtoDb;
     }
 
     public async Task<Produto?> AdicionarAsync(Produto produto, CancellationToken cancellationToken = default)
