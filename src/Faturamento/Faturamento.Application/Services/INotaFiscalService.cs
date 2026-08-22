@@ -1,6 +1,5 @@
 using Faturamento.Application.Common;
 using Faturamento.Application.DTOs;
-using Faturamento.Domain.Entities;
 
 namespace Faturamento.Application.Services;
 

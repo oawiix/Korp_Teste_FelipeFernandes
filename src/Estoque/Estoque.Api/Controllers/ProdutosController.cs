@@ -1,4 +1,3 @@
-using Estoque.Application.Common;
 using Estoque.Application.DTOs;
 using Estoque.Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -16,41 +15,61 @@ public class ProdutosController : ControllerBase
         _produtoService = produtoService;
     }
 
-    [HttpPost("CriarProduto")]
+    [HttpGet("/Listar")]
+    public async Task<IActionResult> ObterProdutosListAsync(CancellationToken cancellationToken)
+    {
+        var result = await _produtoService.ObterProdutosListAsync(cancellationToken);
+        if (!result.IsSuccess)
+        {
+            var responseError = new ResponseModel<IEnumerable<ProdutoDto>>(
+                data: null!,
+                Message: result.Error!,
+                Success: false,
+                TimeStamp: DateTime.UtcNow
+            );
+            return BadRequest(responseError);
+        }
+
+        var responseSuccess = new ResponseModel<IEnumerable<ProdutoDto>>(
+            data: result.Value!,
+            Message: "Produtos encontrados.",
+            Success: true,
+            TimeStamp: DateTime.Now
+            );
+        
+        return Ok(responseSuccess);
+    }
+
+
+[HttpPost("CriarProduto")]
     public async Task<IActionResult> CriarProdutoAsync([FromBody] CriarProdutoDto produto,
         CancellationToken cancellationToken)
     {
-        try
+        var result = await _produtoService.CriarProdutoAsync(produto, cancellationToken);
+
+        if (!result.IsSuccess)
         {
-            var result = await _produtoService.CriarProdutoAsync(produto, cancellationToken);
-
-            if (!result.IsSuccess)
-            {
-                var responseError = new ResponseModel<CriarProdutoDto>(
-                    data: default!,
-                    Message: result.Error!,
-                    Success: false,
-                    TimeStamp: DateTime.UtcNow
-                );
-                return BadRequest(responseError);
-            }
-
-            var responseSuccess = new ResponseModel<CriarProdutoDto>(
+            var responseError = new ResponseModel<CriarProdutoDto>(
                 data: result.Value!,
-                Message: "Produto criado com sucesso.",
-                Success: true,
-                TimeStamp: DateTime.Now
+                Message: result.Error!,
+                Success: false,
+                TimeStamp: DateTime.UtcNow
             );
-            return Ok(responseSuccess.data);
+            return BadRequest(responseError);
         }
-        catch (Exception ex)
-        {
-            return BadRequest(Result<string>.Failure(ex.Message));
-        }
-    }
-    
 
-    [HttpGet("{produtoId}")]
+        var responseSuccess = new ResponseModel<CriarProdutoDto>(
+            data: result.Value!,
+            Message: "Produto criado com sucesso.",
+            Success: true,
+            TimeStamp: DateTime.Now
+        );
+        return Ok(responseSuccess.data);
+    }
+
+
+
+[HttpGet("{produtoId}")]
     public async Task<IActionResult> ObterProdutoPorIdAsync([FromRoute]Guid produtoId, CancellationToken cancellationToken)
     {
             var result = await _produtoService.ObterProdutoPorIdAsync(produtoId, cancellationToken);
@@ -80,13 +99,11 @@ public class ProdutosController : ControllerBase
     public async Task<IActionResult> AtualizarProdutoAsync([FromRoute]Guid produtoId, [FromBody]AtualizarProdutoDto produto,
         CancellationToken cancellationToken)
     {
-        try
-        {
             var result = await  _produtoService.AtualizarProdutoAsync(produtoId, produto, cancellationToken);
             if (!result.IsSuccess)
             {
                 var responseError = new ResponseModel<AtualizarProdutoDto?>(
-                    data: null,
+                    data: result.Value!,
                     Message: "Erro ao atualizar produto",
                     Success: false,
                     TimeStamp: DateTime.Now
@@ -100,24 +117,17 @@ public class ProdutosController : ControllerBase
                 TimeStamp: DateTime.Now
             );
             return Ok(responseSuccess);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(Result<string>.Failure(ex.Message));
-        }
     }
 
     [HttpDelete("{produtoId}")]
     public async Task<IActionResult> RemoverProdutoAsync([FromRoute] Guid produtoId,
         CancellationToken cancellationToken)
     {
-        try
-        {
             var result = await _produtoService.RemoverProdutoAsync(produtoId, cancellationToken);
             if (!result.IsSuccess)
             {
                 var responseError = new ResponseModel<ProdutoDto?>(
-                    data: null,
+                    data: result.Value!,
                     Message: "Erro ao remover produto",
                     Success: false,
                     TimeStamp: DateTime.Now
@@ -132,10 +142,5 @@ public class ProdutosController : ControllerBase
                 TimeStamp:DateTime.Now
             );
             return Ok(responseSuccess);
-        }
-        catch (Exception ex)
-        {
-            return NotFound(Result<string>.Failure(ex.Message));
-        }
     }
 }

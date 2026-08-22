@@ -14,9 +14,17 @@ public class ProdutoRepository : IProdutoRepository
         _context = context;
     }
 
+    public async Task<IReadOnlyCollection<Produto?>> ObterProdutosListAsync(CancellationToken cancellationToken = default)
+    {
+        List<Produto> produtos = await _context.Produtos
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+        return produtos;
+    }
     public async Task<Produto?> ObterProdutoPorIdAsync(Guid produtoId, CancellationToken cancellationToken = default)
     {
-        var produtoDb = await _context.Produtos.AsNoTracking().
+        var produtoDb = await _context.Produtos
+            .AsNoTracking().
             FirstOrDefaultAsync(p => p.Id == produtoId, cancellationToken);
         return produtoDb;
     }
@@ -30,19 +38,23 @@ public class ProdutoRepository : IProdutoRepository
 
     public async Task<Produto?> AtualizarAsync(Produto produto, CancellationToken cancellationToken = default)
     {
-        var produtoDb = await _context.Produtos.FirstOrDefaultAsync(p => p.Id == produto.Id,  cancellationToken);
+        var produtoDb = await _context.Produtos
+            .FirstOrDefaultAsync(p => p.Id == produto.Id,  cancellationToken);
         if(produtoDb == null) return null;
         produtoDb.Atualizar(produto);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context
+            .SaveChangesAsync(cancellationToken);
         return produtoDb;
     }
 
     public async Task<Produto?> RemoverAsync(Guid produtoId, CancellationToken cancellationToken = default)
     {
-        var produtoDb = await _context.Produtos.FirstOrDefaultAsync(p => p.Id == produtoId, cancellationToken);
+        var produtoDb = await _context.Produtos
+            .FirstOrDefaultAsync(p => p.Id == produtoId, cancellationToken);
         if (produtoDb == null) return null;
          _context.Remove(produtoDb);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context
+            .SaveChangesAsync(cancellationToken);
         return produtoDb;
     }
 }

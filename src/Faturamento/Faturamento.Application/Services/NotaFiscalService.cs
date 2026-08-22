@@ -48,7 +48,7 @@ public class NotaFiscalService : INotaFiscalService
     {
         var notasFiscaisDb = await _repository.ObterNotasFiscaisListAsync(cancellationToken);
         var notasFiscaisDbList = notasFiscaisDb.ToList();
-        if (notasFiscaisDbList.Any() == false)
+        if (!notasFiscaisDbList.Any())
         {
             return Result<IEnumerable<ObterNotasFiscaisListDto?>>.Failure("Não foi possivel obter as notas fiscais.");
         }

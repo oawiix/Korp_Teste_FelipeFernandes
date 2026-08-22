@@ -21,8 +21,6 @@ public class NotasFiscaisController : ControllerBase
         CancellationToken cancellationToken = default)
     {
         {
-            try
-            {
                 var result = await _notaFiscalService.ObterNotaFiscalPorIdAsync(notaFiscalId, cancellationToken);
 
                 if (!result.IsSuccess)
@@ -43,11 +41,6 @@ public class NotasFiscaisController : ControllerBase
                     TimeStamp: DateTime.Now
                 );
                 return Ok(responseSuccess);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(Result<string>.Failure(ex.Message));
-            }
         }
     }
 
@@ -55,8 +48,6 @@ public class NotasFiscaisController : ControllerBase
     public async Task<IActionResult> ObterNotasFiscaisListAsync(CancellationToken cancellationToken = default)
     {
         {
-            try
-            {
                 var result = await _notaFiscalService.ObterNotasFiscaisListAsync(cancellationToken);
 
                 if (!result.IsSuccess)
@@ -77,11 +68,6 @@ public class NotasFiscaisController : ControllerBase
                     TimeStamp: DateTime.Now
                 );
                 return Ok(responseSuccess);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(Result<string>.Failure(ex.Message));
-            }
         }
     }
     
@@ -91,8 +77,6 @@ public class NotasFiscaisController : ControllerBase
         CancellationToken cancellationToken = default)
     {
         {
-            try
-            {
                 var result = await _notaFiscalService.
                     RemoverNotaFiscalPorIdAsync(notaFiscalId, cancellationToken);
                 if (!result.IsSuccess)
@@ -115,11 +99,6 @@ public class NotasFiscaisController : ControllerBase
                     TimeStamp: DateTime.Now
                     );
                 return Ok(responseSuccess);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(Result<string>.Failure(ex.Message));
-            }
         }
     }
     
@@ -128,8 +107,6 @@ public class NotasFiscaisController : ControllerBase
         CancellationToken cancellationToken = default)
     {
         {
-            try
-            {
                 var verify = await _notaFiscalService.ObterNotaFiscalPorIdAsync(notaFiscalId, cancellationToken);
                 if (!verify.IsSuccess)
                 {
@@ -151,11 +128,6 @@ public class NotasFiscaisController : ControllerBase
                     TimeStamp: DateTime.Now
                 );
                 return Ok(responseSuccess);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(Result<string>.Failure(ex.Message));
-            }
         }
     }
     
@@ -164,8 +136,6 @@ public class NotasFiscaisController : ControllerBase
         CancellationToken cancellationToken = default)
     {
         {
-            try
-            {
                 var result = await _notaFiscalService.CriarNotaFiscalAsync(notaFiscal, cancellationToken);
                 var responseSuccess = new ResponseModel<CriarNotaFiscalDto>
                 (
@@ -175,11 +145,6 @@ public class NotasFiscaisController : ControllerBase
                     TimeStamp: DateTime.Now
                 );
                 return Ok(responseSuccess);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(Result<string>.Failure(ex.Message));
-            }
         }
     }
     

@@ -14,16 +14,29 @@ public class ProdutoService : IProdutoService
         _repository = produtoRepository;
     }
 
+    public async Task<Result<IEnumerable<ProdutoDto>>> ObterProdutosListAsync(CancellationToken cancellationToken = default)
+    {
+        var produtosDb = await _repository
+            .ObterProdutosListAsync(cancellationToken);
+        var produtos = produtosDb.ToList();
+        if(!produtos.Any()) return Result<IEnumerable<ProdutoDto>>.Failure("Nenhum produto disponivel.");
+        
+        var response = produtosDb.Select(p => new ProdutoDto(
+            p.Codigo,
+            p.Descricao,
+            p.Saldo)).ToList()
+            ;
+        return Result<IEnumerable<ProdutoDto>>.Success(response);
+    }
+    
     public async Task<Result<CriarProdutoDto>> CriarProdutoAsync(CriarProdutoDto produto,
         CancellationToken cancellationToken = default)
     { 
-        //Verifica se o saldo inicial é menor que 0
         if (produto.SaldoInicial < 0) return Result<CriarProdutoDto>.Failure("Saldo inicial nao pode ser menor que zero.");
         
         var newProduto = new Produto(produto.Codigo, produto.Descricao, produto.SaldoInicial);
         await _repository.AdicionarAsync(newProduto, cancellationToken);
         
-        //Verificar se foi criado no banco
         var verifyProduto = await _repository.ObterProdutoPorIdAsync(newProduto.Id, cancellationToken);
         if (verifyProduto == null) return Result<CriarProdutoDto>.Failure("Erro ao criar produto");
         

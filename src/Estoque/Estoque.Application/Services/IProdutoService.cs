@@ -5,6 +5,7 @@ namespace Estoque.Application.Services;
 
 public interface IProdutoService
 {
+    Task<Result<IEnumerable<ProdutoDto>>> ObterProdutosListAsync(CancellationToken cancellationToken = default);
     Task<Result<CriarProdutoDto>> CriarProdutoAsync(CriarProdutoDto produto,
         CancellationToken cancellationToken = default);
     Task<Result<ProdutoDto>> BaixarEstoqueAsync(Guid produtoId, int quantidade,
