@@ -29,7 +29,9 @@ namespace Faturamento.Infrastructure.Migrations
                 name: "item_nota_fiscal",
                 columns: table => new
                 {
-                    item_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    produto_id = table.Column<Guid>(type: "uuid", nullable: false),
                     codigo = table.Column<string>(type: "text", nullable: false),
                     descricao = table.Column<string>(type: "text", nullable: false),
                     saldo = table.Column<int>(type: "integer", nullable: false),
@@ -37,7 +39,7 @@ namespace Faturamento.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_item_nota_fiscal", x => x.item_id);
+                    table.PrimaryKey("pk_item_nota_fiscal", x => x.id);
                     table.ForeignKey(
                         name: "fk_item_nota_fiscal_nota_fiscal_nota_fiscal_id",
                         column: x => x.nota_fiscal_id,

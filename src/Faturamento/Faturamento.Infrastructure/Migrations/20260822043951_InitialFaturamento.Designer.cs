@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faturamento.Infrastructure.Migrations
 {
     [DbContext(typeof(FaturamentoDbContext))]
-    [Migration("20260821192426_InitialFaturamento")]
+    [Migration("20260822043951_InitialFaturamento")]
     partial class InitialFaturamento
     {
         /// <inheritdoc />
@@ -27,10 +27,12 @@ namespace Faturamento.Infrastructure.Migrations
 
             modelBuilder.Entity("Faturamento.Domain.Entities.ItemNotaFiscal", b =>
                 {
-                    b.Property<Guid>("ItemId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("item_id");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Codigo")
                         .IsRequired()
@@ -46,11 +48,15 @@ namespace Faturamento.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("nota_fiscal_id");
 
+                    b.Property<Guid>("ProdutoId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("produto_id");
+
                     b.Property<int>("Saldo")
                         .HasColumnType("integer")
                         .HasColumnName("saldo");
 
-                    b.HasKey("ItemId")
+                    b.HasKey("Id")
                         .HasName("pk_item_nota_fiscal");
 
                     b.HasIndex("NotaFiscalId")

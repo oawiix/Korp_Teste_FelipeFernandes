@@ -36,7 +36,8 @@ public class FaturamentoDbContext : DbContext
         });
         modelBuilder.Entity<ItemNotaFiscal>(builder =>
         {
-            builder.HasKey(n => n.ItemId);
+            builder.HasKey(n => n.Id);
+            builder.Property(p => p.ProdutoId).IsRequired();
             builder.Property(p => p.Codigo).IsRequired();
             builder.Property(p => p.Descricao).IsRequired();
             builder.Property(p =>p.Saldo).IsRequired();
