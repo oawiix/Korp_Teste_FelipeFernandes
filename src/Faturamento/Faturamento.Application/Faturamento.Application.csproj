@@ -2,6 +2,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Faturamento.Domain\Faturamento.Domain.csproj" />
+    <ProjectReference Include="..\..\MessageContracts\Korp.MessageContracts\Korp.MessageContracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MassTransit" />
+    <PackageReference Include="MassTransit.RabbitMQ" />
   </ItemGroup>
 
   <PropertyGroup>

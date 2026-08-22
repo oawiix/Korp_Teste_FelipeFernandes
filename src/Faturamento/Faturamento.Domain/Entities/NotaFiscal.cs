@@ -13,7 +13,7 @@ public class NotaFiscal
     {
         Id = id;
         Ativo = ativo;
-        ItemNotaFiscal = itemNotasFiscal;
+        if(itemNotasFiscal.Any()) ItemNotaFiscal = itemNotasFiscal;
     }
     public NotaFiscal(ICollection<ItemNotaFiscal> itemNotaFiscal)
     {

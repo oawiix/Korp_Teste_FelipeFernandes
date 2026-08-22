@@ -12,4 +12,7 @@
     <Project Path="src/Faturamento/Faturamento.Domain/Faturamento.Domain.csproj" />
     <Project Path="src/Faturamento/Faturamento.Infrastructure/Faturamento.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/MessageContracts/">
+    <Project Path="src/MessageContracts/Korp.MessageContracts/Korp.MessageContracts.csproj" />
+  </Folder>
 </Solution>

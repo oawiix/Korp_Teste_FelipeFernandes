@@ -49,4 +49,11 @@ public class NotaFiscalRepository : INotaFiscalRepository
         await _context.SaveChangesAsync(cancellationToken);
         return oldNotaFiscal;
     }
+
+    public async Task<NotaFiscal?> CriarNotaFiscalAsync(NotaFiscal notaFiscal, CancellationToken cancellationToken = default)
+    {
+        await _context.NotaFiscal.AddAsync(notaFiscal, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+        return notaFiscal;
+    }
 }

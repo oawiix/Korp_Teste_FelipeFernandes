@@ -2,16 +2,20 @@ using Faturamento.Application.Common;
 using Faturamento.Application.DTOs;
 using Faturamento.Domain.Entities;
 using Faturamento.Domain.Repositories;
+using MassTransit;
+
 
 namespace Faturamento.Application.Services;
 
 public class NotaFiscalService : INotaFiscalService
 {
     private readonly INotaFiscalRepository _repository;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public NotaFiscalService(INotaFiscalRepository repository)
+    public NotaFiscalService(INotaFiscalRepository repository, IPublishEndpoint publishEndpoint)
     {
         _repository = repository;
+        _publishEndpoint = publishEndpoint;
     }
 
     public async Task<Result<NotaFiscalDto>> ObterNotaFiscalPorIdAsync(int id,
@@ -23,7 +27,7 @@ public class NotaFiscalService : INotaFiscalService
         {
             Id = notaFiscalDb.Id,
             Ativo = notaFiscalDb.Ativo,
-            ItemNotasFiscal = notaFiscalDb.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
+            ItemNotaFiscal = notaFiscalDb.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
             {
                 ItemId = item.ItemId,
                 Codigo = item.Codigo,
@@ -50,7 +54,7 @@ public async Task<Result<IEnumerable<ObterNotasFiscaisListDto?>>> ObterNotasFisc
         {
             Id = nf!.Id,
             Ativo = nf.Ativo,
-            ItemNotasFiscal = nf.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
+            ItemNotaFiscal = nf.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
             {
                 ItemId = item.ItemId,
                 Codigo = item.Codigo,
@@ -72,7 +76,7 @@ public async Task<Result<IEnumerable<ObterNotasFiscaisListDto?>>> ObterNotasFisc
         {
             Id = notaFiscalDb.Id,
             Ativo = notaFiscalDb.Ativo,
-            ItemNotasFiscal = notaFiscalDb.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto()
+            ItemNotaFiscal = notaFiscalDb.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto()
             {
                 ItemId = item.ItemId,
                 Codigo = item.Codigo,
@@ -92,7 +96,7 @@ public async Task<Result<IEnumerable<ObterNotasFiscaisListDto?>>> ObterNotasFisc
         if (notaFiscalExistente == null)
             return Result<AtualizarNotaFiscalDto>.Failure("Nota fiscal não encontrada.");
 
-        var novosItens = notaFiscal.ItemNotasFiscal.Select(itemDto =>
+        var novosItens = notaFiscal.ItemNotaFiscal.Select(itemDto =>
             new ItemNotaFiscal(
                 itemDto.ItemId,
                 itemDto.Codigo,
@@ -109,7 +113,7 @@ public async Task<Result<IEnumerable<ObterNotasFiscaisListDto?>>> ObterNotasFisc
         {
             Id = notaFiscalExistente.Id,
             Ativo = notaFiscalExistente.Ativo,
-            ItemNotasFiscal = notaFiscalExistente.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
+            ItemNotaFiscal = notaFiscalExistente.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
             {
                 ItemId = item.ItemId,
                 Codigo = item.Codigo,
@@ -119,5 +123,37 @@ public async Task<Result<IEnumerable<ObterNotasFiscaisListDto?>>> ObterNotasFisc
         };
 
         return Result<AtualizarNotaFiscalDto>.Success(responseDto);
+    }
+
+    public async Task<Result<NotaFiscalDto?>> CriarNotaFiscalAsync(NotaFiscalDto notaFiscalDto, CancellationToken cancellationToken = default)
+    {
+        if (await _repository.ObterNotaFiscalPorIdAsync(notaFiscalDto.Id, cancellationToken) == null)
+            return Result<NotaFiscalDto?>.Failure("Não existe essa nota fiscal.");
+        
+        var itens = notaFiscalDto.ItemNotaFiscal?
+            .Select(i => new ItemNotaFiscal(i.ItemId, i.Codigo, i.Descricao, i.Saldo)).ToList();
+        var notaFiscal = new NotaFiscal(notaFiscalDto.Id, notaFiscalDto.Ativo, itens); 
+        
+        var response = await _repository.CriarNotaFiscalAsync(notaFiscal, cancellationToken);
+    
+        if (response == null) 
+        {
+            return Result<NotaFiscalDto?>.Failure("Não foi possível criar a nota fiscal.");
+        }
+
+        var responseSuccess = new NotaFiscalDto
+        {
+            Id = response.Id,
+            Ativo = response.Ativo,
+            ItemNotaFiscal = response.ItemNotaFiscal?.Select(item => new ItemNotaFiscalDto
+            {
+                ItemId = item.ItemId,
+                Codigo = item.Codigo,
+                Descricao = item.Descricao,
+                Saldo = item.Saldo
+            }).ToList() ?? new List<ItemNotaFiscalDto>() 
+        };
+        var evento = new NotaFiscal
+        return Result<NotaFiscalDto?>.Success(responseSuccess);
     }
 }

@@ -10,9 +10,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Faturamento.Application\Faturamento.Application.csproj" />
     <ProjectReference Include="..\Faturamento.Infrastructure\Faturamento.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\MessageContracts\Korp.MessageContracts\Korp.MessageContracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit.RabbitMQ" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>

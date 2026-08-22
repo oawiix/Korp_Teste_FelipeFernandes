@@ -157,4 +157,42 @@ public class NotasFiscaisController : ControllerBase
             }
         }
     }
+    
+    [HttpPost("/Criar")]
+    public async Task<IActionResult> CriarNotaFiscalAsync([FromBody] NotaFiscalDto notaFiscal,
+        CancellationToken cancellationToken = default)
+    {
+        {
+            try
+            {
+                var verify = await _notaFiscalService.CriarNotaFiscalAsync(notaFiscal, cancellationToken);
+                if (!verify.IsSuccess)
+                {
+                    var responseError = new ResponseModel<NotaFiscalDto>
+                    (
+                        Data: default!,
+                        Message: "A Nota fiscal nao existe.",
+                        Success: false,
+                        TimeStamp: DateTime.Now
+                    );
+                    return BadRequest(responseError);
+                }
+                var result = await _notaFiscalService.CriarNotaFiscalAsync(notaFiscal, cancellationToken);
+                var responseSuccess = new ResponseModel<NotaFiscalDto>
+                (
+                    Data: result.Value!,
+                    Message: "A Nota fiscal foi alterada com sucesso.",
+                    Success: true,
+                    TimeStamp: DateTime.Now
+                );
+                return Ok(responseSuccess);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+    }
+    
+    
 }

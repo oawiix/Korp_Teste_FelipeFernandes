@@ -2,10 +2,30 @@ using Estoque.Application.Services;
 using Estoque.Domain.Repositories;
 using Estoque.Infrastructure.Data;
 using Estoque.Infrastructure.Repositories;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<AtualizarEstoqueConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("rabbitmq", "/", h => 
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+        
+        cfg.ReceiveEndpoint("atualizar-estoque-fila", e =>
+        {
+            e.ConfigureConsumer<AtualizarEstoqueConsumer>(context);
+        });
+    });
+});
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

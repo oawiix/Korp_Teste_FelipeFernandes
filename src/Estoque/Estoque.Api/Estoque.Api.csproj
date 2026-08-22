@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Estoque.Infrastructure\Estoque.Infrastructure.csproj" />
     <ProjectReference Include="..\Estoque.Application\Estoque.Application.csproj" />
+    <ProjectReference Include="..\..\MessageContracts\Korp.MessageContracts\Korp.MessageContracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit.RabbitMQ" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
