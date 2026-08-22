@@ -31,7 +31,7 @@ public class NotaFiscalService : INotaFiscalService
             Ativo = notaFiscalDb.Ativo,
             ItemNotaFiscal = notaFiscalDb.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
             {
-                ItemId = item.ItemId,
+                ItemId = item.ProdutoId,
                 Codigo = item.Codigo,
                 Descricao = item.Descricao,
                 Saldo = item.Saldo
@@ -59,7 +59,7 @@ public class NotaFiscalService : INotaFiscalService
             Ativo = nf.Ativo,
             ItemNotaFiscal = nf.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
             {
-                ItemId = item.ItemId,
+                ItemId = item.ProdutoId,
                 Codigo = item.Codigo,
                 Descricao = item.Descricao,
                 Saldo = item.Saldo
@@ -74,14 +74,14 @@ public class NotaFiscalService : INotaFiscalService
     {
         var notaFiscalDb = await _repository.ObterNotaFiscalPorIdAsync(id, cancellationToken);
         if (notaFiscalDb == null)
-            return Result<RemoverNotaFiscalDto>.Failure("Nao existe Nota Fiscal com este ItemId.");
+            return Result<RemoverNotaFiscalDto>.Failure("Nao existe Nota Fiscal com este ProdutoId.");
         var response = new RemoverNotaFiscalDto
         {
             Id = notaFiscalDb.Id,
             Ativo = notaFiscalDb.Ativo,
             ItemNotaFiscal = notaFiscalDb.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto()
             {
-                ItemId = item.ItemId,
+                ItemId = item.ProdutoId,
                 Codigo = item.Codigo,
                 Descricao = item.Descricao,
                 Saldo = item.Saldo
@@ -119,7 +119,7 @@ public class NotaFiscalService : INotaFiscalService
             Ativo = notaFiscalExistente.Ativo,
             ItemNotaFiscal = notaFiscalExistente.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
             {
-                ItemId = item.ItemId,
+                ItemId = item.ProdutoId,
                 Codigo = item.Codigo,
                 Descricao = item.Descricao,
                 Saldo = item.Saldo
@@ -129,44 +129,47 @@ public class NotaFiscalService : INotaFiscalService
         return Result<AtualizarNotaFiscalDto>.Success(responseDto);
     }
 
-public async Task<Result<NotaFiscalDto>> CriarNotaFiscalAsync(NotaFiscalDto notaFiscalDto,
+    public async Task<Result<CriarNotaFiscalDto>> CriarNotaFiscalAsync(CriarNotaFiscalDto notaFiscalDto,
         CancellationToken cancellationToken = default)
     {
         var itensEntidades = notaFiscalDto.ItemNotaFiscal?
-            .Select(i =>
-                new ItemNotaFiscal(i.ItemId, i.Codigo, i.Descricao,
-                    i.Saldo))
+            .Select(i => new ItemNotaFiscal(
+                i.ProdutoId,
+                i.Codigo,
+                i.Descricao,
+                i.Saldo
+            ))
             .ToList() ?? new List<ItemNotaFiscal>();
 
-        var notaFiscal = new NotaFiscal(notaFiscalDto.Id, notaFiscalDto.Ativo, itensEntidades);
+        var notaFiscal = new NotaFiscal(0, notaFiscalDto.Ativo, itensEntidades);
 
         var response = await _repository.CriarNotaFiscalAsync(notaFiscal, cancellationToken);
 
         if (response == null)
         {
-            return Result<NotaFiscalDto>.Failure("Não foi possível criar a nota fiscal.");
+            return Result<CriarNotaFiscalDto>.Failure("Não foi possível criar a nota fiscal.");
         }
 
-        var responseSuccess = new NotaFiscalDto
+        var responseSuccess = new CriarNotaFiscalDto
         {
             Id = response.Id,
             Ativo = response.Ativo,
-            ItemNotaFiscal = response.ItemNotaFiscal?.Select(item => new ItemNotaFiscalDto
+            ItemNotaFiscal = response.ItemNotaFiscal?.Select(item => new CriarItemNotaFiscalDto
             {
-                ItemId = item.ItemId,
+                ProdutoId =  item.ProdutoId,
                 Codigo = item.Codigo,
                 Descricao = item.Descricao,
                 Saldo = item.Saldo
-            }).ToList() ?? new List<ItemNotaFiscalDto>()
+            }).ToList() ?? new List<CriarItemNotaFiscalDto>()
         };
 
         var itensParaEvento = responseSuccess.ItemNotaFiscal?
-            .Select(i => new Korp.MessageContracts.Events.ItemNotaFiscalDto(i.ItemId, (int)i.Saldo)) // Ajuste o campo de saldo/quantidade se necessário
+            .Select(i => new Korp.MessageContracts.Events.ItemNotaFiscalDto(i.ProdutoId, (int)i.Saldo))
             .ToList() ?? new List<Korp.MessageContracts.Events.ItemNotaFiscalDto>();
 
-        var evento = new NotaFiscalParaImpressaoEvent(notaFiscal.Id, itensParaEvento);
+        var evento = new NotaFiscalParaImpressaoEvent(response.Id, itensParaEvento);
         await _publishEndpoint.Publish(evento, cancellationToken);
 
-        return Result<NotaFiscalDto>.Success(responseSuccess);
+        return Result<CriarNotaFiscalDto>.Success(responseSuccess);
     }
 }

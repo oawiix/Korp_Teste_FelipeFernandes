@@ -31,13 +31,14 @@ public class ProdutoService : IProdutoService
         return Result<CriarProdutoDto>.Success(responseProduto);
     }
 
-    public async Task BaixarEstoqueAsync(Guid produtoId, int quantidade,
+    public async Task<Result<ProdutoDto>> BaixarEstoqueAsync(Guid produtoId, int quantidade,
         CancellationToken cancellationToken = default)
     {
         var produtoDb = await _repository.ObterProdutoPorIdAsync(produtoId,  cancellationToken);
-        if (produtoDb == null) throw new Exception("Produto nao encontrado");
-        
+        if (produtoDb == null) return Result<ProdutoDto>.Failure("Produto nao encontrado para enviar evento.");
         produtoDb.AtualizarSaldo(quantidade);
+        var responseProduto = new ProdutoDto(produtoDb.Codigo, produtoDb.Descricao, produtoDb.Saldo);
+        return Result<ProdutoDto>.Success(responseProduto);
     }
 
     public async Task<Result<ProdutoDto>> ObterProdutoPorIdAsync(Guid produtoId,
@@ -56,7 +57,7 @@ public class ProdutoService : IProdutoService
     public async Task<Result<AtualizarProdutoDto>> AtualizarProdutoAsync(Guid produtoId, AtualizarProdutoDto produto,
         CancellationToken cancellationToken = default)
     {
-        if (produto.novoSaldo < 0) throw new Exception("Saldo nao pode ser menor que zero.");
+        if (produto.novoSaldo < 0) return Result<AtualizarProdutoDto>.Failure("Saldo inicial nao pode ser menor que zero.");
             
         var oldProduto = await _repository.ObterProdutoPorIdAsync(produtoId, cancellationToken);
         if (oldProduto == null) return Result<AtualizarProdutoDto>.Failure("Produto nao encontrado");
@@ -76,7 +77,7 @@ public class ProdutoService : IProdutoService
     {
         //Verificar se existe o produto
         var query = await _repository.ObterProdutoPorIdAsync(produtoId, cancellationToken);
-        if (query == null) throw new Exception("Produto nao encontrado");
+        if (query == null) return Result<ProdutoDto>.Failure("Produto nao encontrado");
         await _repository.RemoverAsync(produtoId, cancellationToken);
         var response = new ProdutoDto(query.Codigo, query.Descricao, query.Saldo);
         return Result<ProdutoDto>.Success(response);

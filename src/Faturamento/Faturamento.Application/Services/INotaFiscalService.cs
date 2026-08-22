@@ -13,5 +13,5 @@ public interface INotaFiscalService
         CancellationToken cancellationToken = default);
     Task<Result<AtualizarNotaFiscalDto>> AtualizarNotaFiscalPorIdAsync(int novaFiscalId, AtualizarNotaFiscalDto notaFiscal,
         CancellationToken cancellationToken = default);
-    Task<Result<NotaFiscalDto>> CriarNotaFiscalAsync(NotaFiscalDto notaFiscal, CancellationToken cancellationToken = default);
+    Task<Result<CriarNotaFiscalDto>> CriarNotaFiscalAsync(CriarNotaFiscalDto notaFiscal, CancellationToken cancellationToken = default);
 }

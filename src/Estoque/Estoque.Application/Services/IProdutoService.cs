@@ -7,9 +7,9 @@ public interface IProdutoService
 {
     Task<Result<CriarProdutoDto>> CriarProdutoAsync(CriarProdutoDto produto,
         CancellationToken cancellationToken = default);
-    Task BaixarEstoqueAsync(Guid produtoId, int quantidade,
+    Task<Result<ProdutoDto>> BaixarEstoqueAsync(Guid produtoId, int quantidade,
         CancellationToken cancellationToken = default);
-    Task<Result<ProdutoDto>> ObterProdutoPorIdAsync(Guid produtoId,
+    Task<Result<ProdutoDto>> ObterProdutoPorIdAsync(Guid produtoIdString,
         CancellationToken cancellationToken = default);
     Task<Result<AtualizarProdutoDto>> AtualizarProdutoAsync(Guid produtoId, AtualizarProdutoDto produto,
         CancellationToken cancellationToken = default);

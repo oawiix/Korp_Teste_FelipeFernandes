@@ -1,9 +1,8 @@
 namespace Faturamento.Application.DTOs;
 
-public record ItemNotaFiscalDto
+public record CriarItemNotaFiscalDto
 {
-    public int Id { get;  init; }
-    public Guid ItemId { get;  init; }
+    public Guid ProdutoId { get;  init; }
     public string Codigo { get;  init; } = String.Empty;
     public string Descricao { get;  init; } = String.Empty;
     public int Saldo { get;  init; } = Int32.MinValue;

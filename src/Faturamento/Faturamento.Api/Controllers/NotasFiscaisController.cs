@@ -1,3 +1,4 @@
+using Faturamento.Application.Common;
 using Faturamento.Application.DTOs;
 using Faturamento.Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +46,7 @@ public class NotasFiscaisController : ControllerBase
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(Result<string>.Failure(ex.Message));
             }
         }
     }
@@ -79,7 +80,7 @@ public class NotasFiscaisController : ControllerBase
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(Result<string>.Failure(ex.Message));
             }
         }
     }
@@ -117,7 +118,7 @@ public class NotasFiscaisController : ControllerBase
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(Result<string>.Failure(ex.Message));
             }
         }
     }
@@ -153,13 +154,13 @@ public class NotasFiscaisController : ControllerBase
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(Result<string>.Failure(ex.Message));
             }
         }
     }
     
     [HttpPost("/Criar")]
-    public async Task<IActionResult> CriarNotaFiscalAsync([FromBody] NotaFiscalDto notaFiscal,
+    public async Task<IActionResult> CriarNotaFiscalAsync([FromBody] CriarNotaFiscalDto notaFiscal,
         CancellationToken cancellationToken = default)
     {
         {
@@ -178,7 +179,7 @@ public class NotasFiscaisController : ControllerBase
                     return BadRequest(responseError);
                 }
                 var result = await _notaFiscalService.CriarNotaFiscalAsync(notaFiscal, cancellationToken);
-                var responseSuccess = new ResponseModel<NotaFiscalDto>
+                var responseSuccess = new ResponseModel<CriarNotaFiscalDto>
                 (
                     Data: result.Value!,
                     Message: "A Nota fiscal foi alterada com sucesso.",
@@ -189,7 +190,7 @@ public class NotasFiscaisController : ControllerBase
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(Result<string>.Failure(ex.Message));
             }
         }
     }

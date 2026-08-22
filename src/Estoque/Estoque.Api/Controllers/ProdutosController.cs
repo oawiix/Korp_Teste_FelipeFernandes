@@ -1,3 +1,4 @@
+using Estoque.Application.Common;
 using Estoque.Application.DTOs;
 using Estoque.Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -40,11 +41,11 @@ public class ProdutosController : ControllerBase
                 Success: true,
                 TimeStamp: DateTime.Now
             );
-            return Ok(responseSuccess);
+            return Ok(responseSuccess.data);
         }
         catch (Exception ex)
         {
-            return BadRequest(ex);
+            return BadRequest(Result<string>.Failure(ex.Message));
         }
     }
     
@@ -52,14 +53,12 @@ public class ProdutosController : ControllerBase
     [HttpGet("{produtoId}")]
     public async Task<IActionResult> ObterProdutoPorIdAsync([FromRoute]Guid produtoId, CancellationToken cancellationToken)
     {
-        try
-        {
             var result = await _produtoService.ObterProdutoPorIdAsync(produtoId, cancellationToken);
             if (!result.IsSuccess)
             {
                 var responseError = new ResponseModel<ProdutoDto>(
                     data: result.Value!,
-                    Message: "Usuario nao encontrado.",
+                    Message: "Produto nao encontrado.",
                     Success: false,
                     TimeStamp: DateTime.Now
                 );
@@ -68,17 +67,13 @@ public class ProdutosController : ControllerBase
 
             var responseSuccess = new ResponseModel<ProdutoDto>(
                 data: result.Value!,
-                Message: "Usuario encontrado",
+                Message: "Produto encontrado",
                 Success: true,
                 TimeStamp: DateTime.Now
             );
             return Ok(responseSuccess);
         }
-        catch (Exception ex)
-        {
-            return BadRequest(ex);
-        }
-    }
+    
     
 
     [HttpPut("{produtoId}", Name = "AtualizarProduto")]
@@ -108,7 +103,7 @@ public class ProdutosController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ex);
+            return BadRequest(Result<string>.Failure(ex.Message));
         }
     }
 
@@ -140,7 +135,7 @@ public class ProdutosController : ControllerBase
         }
         catch (Exception ex)
         {
-            return NotFound(ex);
+            return NotFound(Result<string>.Failure(ex.Message));
         }
     }
 }
