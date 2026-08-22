@@ -23,9 +23,10 @@ public class NotaFiscalRepository : INotaFiscalRepository
         return notaFiscalDb;
     }
 
-    public async Task<IEnumerable<NotaFiscal?>> ObterNotasFiscaisListAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<NotaFiscal?>> ObterNotasFiscaisListAsync(CancellationToken cancellationToken = default)
     {
             List<NotaFiscal> notasFiscaisDb = await _context.NotaFiscal
+                .Include(n => n.ItemNotaFiscal)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
             return notasFiscaisDb;

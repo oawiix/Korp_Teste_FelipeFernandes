@@ -1,9 +1,9 @@
 
 namespace Faturamento.Application.DTOs;
 
-public class ObterNotasFiscaisListDto
+public record ObterNotasFiscaisListDto
 {
-    public int Id { get;  set; }
-    public bool Ativo { get;  set; } = true;
-    public ICollection<ItemNotaFiscalDto> ItemNotasFiscal { get;  set; } = new List<ItemNotaFiscalDto>();
+    public int Id { get;  init; }
+    public bool Ativo { get;  init; } = true;
+    public ICollection<ItemNotaFiscalDto> ItemNotasFiscal { get;  init; } = new List<ItemNotaFiscalDto>();
 }
