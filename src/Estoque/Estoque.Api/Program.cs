@@ -1,5 +1,6 @@
 using Estoque.Application.Services;
 using Estoque.Domain.Repositories;
+using Estoque.Infrastructure.Consumers;
 using Estoque.Infrastructure.Data;
 using Estoque.Infrastructure.Repositories;
 using MassTransit;
@@ -10,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMassTransit(x =>
 {
+    x.SetKebabCaseEndpointNameFormatter();
+    
     x.AddConsumer<AtualizarEstoqueConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
@@ -22,7 +25,7 @@ builder.Services.AddMassTransit(x =>
         
         cfg.ReceiveEndpoint("atualizar-estoque-fila", e =>
         {
-            e.ConfigureConsumer<AtualizarEstoqueConsumer>(context);
+            cfg.ConfigureEndpoints(context);
         });
     });
 });

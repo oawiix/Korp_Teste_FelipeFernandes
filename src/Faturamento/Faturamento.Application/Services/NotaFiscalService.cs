@@ -2,7 +2,9 @@ using Faturamento.Application.Common;
 using Faturamento.Application.DTOs;
 using Faturamento.Domain.Entities;
 using Faturamento.Domain.Repositories;
+using Korp.MessageContracts.Events;
 using MassTransit;
+using ItemNotaFiscalDto = Faturamento.Application.DTOs.ItemNotaFiscalDto;
 
 
 namespace Faturamento.Application.Services;
@@ -36,12 +38,12 @@ public class NotaFiscalService : INotaFiscalService
             }).ToList()
 
         };
-            return Result<NotaFiscalDto>.Success(response); 
+        return Result<NotaFiscalDto>.Success(response);
     }
-    
 
 
-public async Task<Result<IEnumerable<ObterNotasFiscaisListDto?>>> ObterNotasFiscaisListAsync(
+
+    public async Task<Result<IEnumerable<ObterNotasFiscaisListDto?>>> ObterNotasFiscaisListAsync(
         CancellationToken cancellationToken = default)
     {
         var notasFiscaisDb = await _repository.ObterNotasFiscaisListAsync(cancellationToken);
@@ -50,6 +52,7 @@ public async Task<Result<IEnumerable<ObterNotasFiscaisListDto?>>> ObterNotasFisc
         {
             return Result<IEnumerable<ObterNotasFiscaisListDto?>>.Failure("Não foi possivel obter as notas fiscais.");
         }
+
         var response = notasFiscaisDb.Select(nf => new ObterNotasFiscaisListDto
         {
             Id = nf!.Id,
@@ -88,7 +91,8 @@ public async Task<Result<IEnumerable<ObterNotasFiscaisListDto?>>> ObterNotasFisc
         return Result<RemoverNotaFiscalDto>.Success(response);
     }
 
-    public async Task<Result<AtualizarNotaFiscalDto>> AtualizarNotaFiscalPorIdAsync(int notaFiscalId, AtualizarNotaFiscalDto notaFiscal,
+    public async Task<Result<AtualizarNotaFiscalDto>> AtualizarNotaFiscalPorIdAsync(int notaFiscalId,
+        AtualizarNotaFiscalDto notaFiscal,
         CancellationToken cancellationToken = default)
     {
         var notaFiscalExistente = await _repository.ObterNotaFiscalPorIdAsync(notaFiscalId, cancellationToken);
@@ -125,20 +129,22 @@ public async Task<Result<IEnumerable<ObterNotasFiscaisListDto?>>> ObterNotasFisc
         return Result<AtualizarNotaFiscalDto>.Success(responseDto);
     }
 
-    public async Task<Result<NotaFiscalDto?>> CriarNotaFiscalAsync(NotaFiscalDto notaFiscalDto, CancellationToken cancellationToken = default)
+public async Task<Result<NotaFiscalDto>> CriarNotaFiscalAsync(NotaFiscalDto notaFiscalDto,
+        CancellationToken cancellationToken = default)
     {
-        if (await _repository.ObterNotaFiscalPorIdAsync(notaFiscalDto.Id, cancellationToken) == null)
-            return Result<NotaFiscalDto?>.Failure("Não existe essa nota fiscal.");
-        
-        var itens = notaFiscalDto.ItemNotaFiscal?
-            .Select(i => new ItemNotaFiscal(i.ItemId, i.Codigo, i.Descricao, i.Saldo)).ToList();
-        var notaFiscal = new NotaFiscal(notaFiscalDto.Id, notaFiscalDto.Ativo, itens); 
-        
+        var itensEntidades = notaFiscalDto.ItemNotaFiscal?
+            .Select(i =>
+                new ItemNotaFiscal(i.ItemId, i.Codigo, i.Descricao,
+                    i.Saldo))
+            .ToList() ?? new List<ItemNotaFiscal>();
+
+        var notaFiscal = new NotaFiscal(notaFiscalDto.Id, notaFiscalDto.Ativo, itensEntidades);
+
         var response = await _repository.CriarNotaFiscalAsync(notaFiscal, cancellationToken);
-    
-        if (response == null) 
+
+        if (response == null)
         {
-            return Result<NotaFiscalDto?>.Failure("Não foi possível criar a nota fiscal.");
+            return Result<NotaFiscalDto>.Failure("Não foi possível criar a nota fiscal.");
         }
 
         var responseSuccess = new NotaFiscalDto
@@ -151,9 +157,16 @@ public async Task<Result<IEnumerable<ObterNotasFiscaisListDto?>>> ObterNotasFisc
                 Codigo = item.Codigo,
                 Descricao = item.Descricao,
                 Saldo = item.Saldo
-            }).ToList() ?? new List<ItemNotaFiscalDto>() 
+            }).ToList() ?? new List<ItemNotaFiscalDto>()
         };
-        var evento = new NotaFiscal
-        return Result<NotaFiscalDto?>.Success(responseSuccess);
+
+        var itensParaEvento = responseSuccess.ItemNotaFiscal?
+            .Select(i => new Korp.MessageContracts.Events.ItemNotaFiscalDto(i.ItemId, (int)i.Saldo)) // Ajuste o campo de saldo/quantidade se necessário
+            .ToList() ?? new List<Korp.MessageContracts.Events.ItemNotaFiscalDto>();
+
+        var evento = new NotaFiscalParaImpressaoEvent(notaFiscal.Id, itensParaEvento);
+        await _publishEndpoint.Publish(evento, cancellationToken);
+
+        return Result<NotaFiscalDto>.Success(responseSuccess);
     }
 }
