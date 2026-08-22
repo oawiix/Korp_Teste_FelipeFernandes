@@ -40,6 +40,10 @@ services:
     depends_on:
       estoque-db:
         condition: service_healthy
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
     
   faturamento-api:
     build:
@@ -53,6 +57,10 @@ services:
     depends_on:
       faturamento-db:
         condition: service_healthy
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
         
   rabbitmq:
     image: rabbitmq:3-management

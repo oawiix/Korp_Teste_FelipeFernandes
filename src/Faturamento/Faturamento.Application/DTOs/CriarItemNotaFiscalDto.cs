@@ -5,5 +5,5 @@ public record CriarItemNotaFiscalDto
     public Guid ProdutoId { get;  init; }
     public string Codigo { get;  init; } = String.Empty;
     public string Descricao { get;  init; } = String.Empty;
-    public int Saldo { get;  init; } = Int32.MinValue;
+    public int Quantidade { get;  init; } = Int32.MinValue;
 }

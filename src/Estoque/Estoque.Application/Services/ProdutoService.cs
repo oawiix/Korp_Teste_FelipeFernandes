@@ -37,6 +37,7 @@ public class ProdutoService : IProdutoService
         var produtoDb = await _repository.ObterProdutoPorIdAsync(produtoId,  cancellationToken);
         if (produtoDb == null) return Result<ProdutoDto>.Failure("Produto nao encontrado para enviar evento.");
         produtoDb.AtualizarSaldo(quantidade);
+        await _repository.AtualizarAsync(produtoDb, cancellationToken);
         var responseProduto = new ProdutoDto(produtoDb.Codigo, produtoDb.Descricao, produtoDb.Saldo);
         return Result<ProdutoDto>.Success(responseProduto);
     }

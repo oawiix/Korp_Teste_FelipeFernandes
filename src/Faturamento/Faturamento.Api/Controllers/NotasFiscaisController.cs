@@ -166,18 +166,6 @@ public class NotasFiscaisController : ControllerBase
         {
             try
             {
-                var verify = await _notaFiscalService.CriarNotaFiscalAsync(notaFiscal, cancellationToken);
-                if (!verify.IsSuccess)
-                {
-                    var responseError = new ResponseModel<NotaFiscalDto>
-                    (
-                        Data: default!,
-                        Message: "A Nota fiscal nao existe.",
-                        Success: false,
-                        TimeStamp: DateTime.Now
-                    );
-                    return BadRequest(responseError);
-                }
                 var result = await _notaFiscalService.CriarNotaFiscalAsync(notaFiscal, cancellationToken);
                 var responseSuccess = new ResponseModel<CriarNotaFiscalDto>
                 (
