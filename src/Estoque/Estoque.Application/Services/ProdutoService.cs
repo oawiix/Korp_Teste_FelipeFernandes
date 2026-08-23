@@ -22,7 +22,7 @@ public class ProdutoService : IProdutoService
         if(!produtos.Any()) return Result<IEnumerable<ProdutoDto>>.Failure("Nenhum produto disponivel.");
         
         var response = produtosDb.Select(p => new ProdutoDto(
-            p.Codigo,
+            p!.Codigo,
             p.Descricao,
             p.Saldo)).ToList()
             ;

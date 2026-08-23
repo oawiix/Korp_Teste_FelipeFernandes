@@ -1,4 +1,3 @@
-using Faturamento.Application.Common;
 using Faturamento.Application.DTOs;
 using Faturamento.Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +25,7 @@ public class NotasFiscaisController : ControllerBase
                 if (!result.IsSuccess)
                 {
                     var responseError = new ResponseModel<NotaFiscalDto>(
-                        Data: default!,
+                        Data: null!,
                         Message: result.Error!,
                         Success: false,
                         TimeStamp: DateTime.UtcNow
@@ -53,7 +52,7 @@ public class NotasFiscaisController : ControllerBase
                 if (!result.IsSuccess)
                 {
                     var responseError = new ResponseModel<IEnumerable<ObterNotasFiscaisListDto>>(
-                        Data: default!,
+                        Data: null!,
                         Message: result.Error!,
                         Success: false,
                         TimeStamp: DateTime.UtcNow
@@ -112,7 +111,7 @@ public class NotasFiscaisController : ControllerBase
                 {
                     var responseError = new ResponseModel<AtualizarNotaFiscalDto>
                     (
-                        Data: default!,
+                        Data: null!,
                         Message: "A Nota fiscal nao existe.",
                         Success: false,
                         TimeStamp: DateTime.Now
@@ -140,7 +139,7 @@ public class NotasFiscaisController : ControllerBase
                 var responseSuccess = new ResponseModel<CriarNotaFiscalDto>
                 (
                     Data: result.Value!,
-                    Message: "A Nota fiscal foi alterada com sucesso.",
+                    Message: "A Nota fiscal foi criada com sucesso.",
                     Success: true,
                     TimeStamp: DateTime.Now
                 );
