@@ -32,6 +32,7 @@ public class FaturamentoDbContext : DbContext
             builder.HasMany(n => n.ItemNotaFiscal)
                 .WithOne()
                 .HasForeignKey("NotaFiscalId")
+                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
         });
         modelBuilder.Entity<ItemNotaFiscal>(builder =>

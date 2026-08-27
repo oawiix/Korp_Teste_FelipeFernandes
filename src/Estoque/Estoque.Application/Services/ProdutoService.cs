@@ -22,7 +22,8 @@ public class ProdutoService : IProdutoService
         if(!produtos.Any()) return Result<IEnumerable<ProdutoDto>>.Failure("Nenhum produto disponivel.");
         
         var response = produtosDb.Select(p => new ProdutoDto(
-            p!.Codigo,
+            p!.Id,
+            p.Codigo,
             p.Descricao,
             p.Saldo)).ToList()
             ;
@@ -51,7 +52,7 @@ public class ProdutoService : IProdutoService
         if (produtoDb == null) return Result<ProdutoDto>.Failure("Produto nao encontrado para enviar evento.");
         produtoDb.AtualizarSaldo(quantidade);
         await _repository.AtualizarAsync(produtoDb, cancellationToken);
-        var responseProduto = new ProdutoDto(produtoDb.Codigo, produtoDb.Descricao, produtoDb.Saldo);
+        var responseProduto = new ProdutoDto(produtoDb.Id, produtoDb.Codigo, produtoDb.Descricao, produtoDb.Saldo);
         return Result<ProdutoDto>.Success(responseProduto);
     }
 
@@ -63,7 +64,7 @@ public class ProdutoService : IProdutoService
         {
             return Result<ProdutoDto>.Failure("Produto nao encontrado");
         }
-        var response =  new ProdutoDto(produto.Codigo, produto.Descricao, produto.Saldo);
+        var response =  new ProdutoDto(produto.Id, produto.Codigo, produto.Descricao, produto.Saldo);
         return Result<ProdutoDto>.Success(response);
     }
 
@@ -93,7 +94,7 @@ public class ProdutoService : IProdutoService
         var query = await _repository.ObterProdutoPorIdAsync(produtoId, cancellationToken);
         if (query == null) return Result<ProdutoDto>.Failure("Produto nao encontrado");
         await _repository.RemoverAsync(produtoId, cancellationToken);
-        var response = new ProdutoDto(query.Codigo, query.Descricao, query.Saldo);
+        var response = new ProdutoDto(query.Id, query.Codigo, query.Descricao, query.Saldo);
         return Result<ProdutoDto>.Success(response);
     }
 }

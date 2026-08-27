@@ -102,32 +102,30 @@ public class NotasFiscaisController : ControllerBase
     }
     
     [HttpPut("{notaFiscalId:int}")]
-    public async Task<IActionResult> AtualizarNotaFiscalPorIdAsync([FromRoute]int notaFiscalId,[FromBody] AtualizarNotaFiscalDto notaFiscal,
+    public async Task<IActionResult> AtualizarNotaFiscalPorIdAsync([FromRoute] int notaFiscalId, [FromBody] AtualizarNotaFiscalDto notaFiscal,
         CancellationToken cancellationToken = default)
     {
+        var result = await _notaFiscalService.AtualizarNotaFiscalPorIdAsync(notaFiscalId, notaFiscal, cancellationToken);
+        if (!result.IsSuccess)
         {
-                var verify = await _notaFiscalService.ObterNotaFiscalPorIdAsync(notaFiscalId, cancellationToken);
-                if (!verify.IsSuccess)
-                {
-                    var responseError = new ResponseModel<AtualizarNotaFiscalDto>
-                    (
-                        Data: null!,
-                        Message: "A Nota fiscal nao existe.",
-                        Success: false,
-                        TimeStamp: DateTime.Now
-                    );
-                    return BadRequest(responseError);
-                }
-                var result = await _notaFiscalService.AtualizarNotaFiscalPorIdAsync(notaFiscalId, notaFiscal, cancellationToken);
-                var responseSuccess = new ResponseModel<AtualizarNotaFiscalDto>
-                (
-                    Data: result.Value!,
-                    Message: "A Nota fiscal foi alterada com sucesso.",
-                    Success: true,
-                    TimeStamp: DateTime.Now
-                );
-                return Ok(responseSuccess);
+            var responseError = new ResponseModel<AtualizarNotaFiscalDto>
+            (
+                Data: null!,
+                Message: result.Error ?? "A Nota fiscal não foi encontrada.",
+                Success: false,
+                TimeStamp: DateTime.Now
+            );
+            return BadRequest(responseError);
         }
+
+        var responseSuccess = new ResponseModel<AtualizarNotaFiscalDto>
+        (
+            Data: result.Value!,
+            Message: "A Nota fiscal foi alterada com sucesso.",
+            Success: true,
+            TimeStamp: DateTime.Now
+        );
+        return Ok(responseSuccess);
     }
     
     [HttpPost("/Criar")]

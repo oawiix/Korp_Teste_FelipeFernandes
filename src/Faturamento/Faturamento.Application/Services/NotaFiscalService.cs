@@ -95,30 +95,27 @@ public class NotaFiscalService : INotaFiscalService
         AtualizarNotaFiscalDto notaFiscal,
         CancellationToken cancellationToken = default)
     {
-        var notaFiscalExistente = await _repository.ObterNotaFiscalPorIdAsync(notaFiscalId, cancellationToken);
-
-        if (notaFiscalExistente == null)
-            return Result<AtualizarNotaFiscalDto>.Failure("Nota fiscal não encontrada.");
-
-        var novosItens = notaFiscal.ItemNotaFiscal.Select(itemDto =>
+        var novosItens = notaFiscal.ItemNotaFiscal?.Select(itemDto =>
             new ItemNotaFiscal(
                 itemDto.ItemId,
                 itemDto.Codigo,
                 itemDto.Descricao,
                 itemDto.Quantidade
             )
-        ).ToList();
+        ).ToList() ?? new List<ItemNotaFiscal>();
 
-        notaFiscalExistente.Atualizar(notaFiscal.Ativo, novosItens);
+        var notaFiscalAtualizada = await _repository.AtualizarNotaFiscalPorIdAsync(notaFiscalId, notaFiscal.Ativo, novosItens, cancellationToken);
 
-        await _repository.AtualizarNotaFiscalPorIdAsync(notaFiscalExistente, cancellationToken);
+        if (notaFiscalAtualizada == null)
+            return Result<AtualizarNotaFiscalDto>.Failure("Nota fiscal não encontrada.");
 
-        var response = new AtualizarNotaFiscalDto()
+        var response = new AtualizarNotaFiscalDto
         {
-            Id = notaFiscalExistente.Id,
-            Ativo = notaFiscalExistente.Ativo,
-            ItemNotaFiscal = notaFiscalExistente.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
+            Id = notaFiscalAtualizada.Id,
+            Ativo = notaFiscalAtualizada.Ativo,
+            ItemNotaFiscal = notaFiscalAtualizada.ItemNotaFiscal.Select(item => new ItemNotaFiscalDto
             {
+                Id = item.Id,
                 ItemId = item.ProdutoId,
                 Codigo = item.Codigo,
                 Descricao = item.Descricao,

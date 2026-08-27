@@ -41,11 +41,27 @@ public class NotaFiscalRepository : INotaFiscalRepository
         return notaFiscalDb;
     }
 
-    public async Task<NotaFiscal?> AtualizarNotaFiscalPorIdAsync(NotaFiscal notaFiscal, CancellationToken cancellationToken = default)
+    public async Task<NotaFiscal?> AtualizarNotaFiscalPorIdAsync(int id, bool ativo,  List<ItemNotaFiscal> itemNotaFiscal, CancellationToken cancellationToken = default)
     {
-        var oldNotaFiscal = await _context.NotaFiscal.FirstOrDefaultAsync(p => p.Id == notaFiscal.Id, cancellationToken);
+        var oldNotaFiscal = await _context.NotaFiscal
+            .Include(n => n.ItemNotaFiscal)
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+
         if (oldNotaFiscal == null) return null;
-        oldNotaFiscal.Atualizar(notaFiscal.Ativo, notaFiscal.ItemNotaFiscal);
+
+        if (ativo)
+            oldNotaFiscal.Ativar();
+        else
+            oldNotaFiscal.Desativar();
+
+        _context.ItemNotaFiscal.RemoveRange(oldNotaFiscal.ItemNotaFiscal);
+        oldNotaFiscal.ItemNotaFiscal.Clear();
+
+        foreach (var item in itemNotaFiscal)
+        {
+            oldNotaFiscal.AddItemToNotaFiscal(item);
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
         return oldNotaFiscal;
     }

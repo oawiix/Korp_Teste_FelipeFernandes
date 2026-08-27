@@ -1,0 +1,15 @@
+Escopo
+1. Funcionalidades a serem desenvolvidas
+Cadastro de Produtos
+Campos obrigatórios:
+● Código
+● Descrição (nome do produto)
+● Saldo (quantidade disponível em estoque)
+Resultado esperado: permitir que um produto seja previamente cadastrado
+para posterior utilização em notas fiscais.
+Cadastro de Notas Fiscais
+Campos obrigatórios:
+● Numeração sequencial
+● Status: Aberta ou Fechada
+● Inclusão de múltiplos produtos com respectivas quantidades
+Resultado esperado: permitir a criação de uma nota fiscal com numeração sequencial e

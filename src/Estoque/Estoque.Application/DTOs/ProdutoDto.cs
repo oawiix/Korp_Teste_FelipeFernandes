@@ -1,3 +1,3 @@
 namespace Estoque.Application.DTOs;
 
-public record ProdutoDto(string Codigo, string Descricao, int SaldoInicial);
+public record ProdutoDto(Guid Id, string Codigo, string Descricao, int SaldoInicial);

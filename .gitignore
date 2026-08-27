@@ -6,6 +6,10 @@
 # dotenv files
 .env
 
+# Angular
+.angular/
+dist/
+
 # User-specific files
 *.rsuser
 *.suo
